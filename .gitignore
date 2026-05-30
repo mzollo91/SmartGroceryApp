@@ -361,3 +361,40 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+######## Adding custom .gitignore below this line. ##########
+
+# ==========================================
+# PYTHON / FASTAPI IGNORES
+# ==========================================
+# Ignore the virtual environment
+venv/
+ENV/
+env/
+
+# Ignore compiled Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore environment variable secret files
+.env
+
+# ==========================================
+# VISUAL STUDIO / .NET IGNORES
+# ==========================================
+# User-specific files and IDE states
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Compiled output directories
+[Bb]in/
+[Oo]bj/
+
+# .NET Core / WebAssembly build artifacts
+.json
+*.blazor.config

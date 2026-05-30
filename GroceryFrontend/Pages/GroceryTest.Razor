@@ -1,0 +1,41 @@
+@page "/grocerytest"
+@inject HttpClient Http
+
+<h3>Backend Connection Test</h3>
+
+@if (routeData==null)
+{
+    <div class = "alert alert-warning">
+        Attempting to reach FastAPI server...
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        Connected! Python Backend responded successfully.
+    </div>
+    <div class="card p-3">
+        <h5>Route Details:</h5>
+        <p><strong>Start:</strong> @routeData.StartLocation</p>
+        <p><strong>End:</strong> @routeData.EndLocation</p>
+        <p><strong>Total Distance:</strong> @routeData.TotalDistanceMiles miles</p>
+    </div>
+}
+
+@code{
+    private RouteResponse? routeData;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Call the Python backend from C#.
+            routeData = await Http.GetFromJsonAsync<RouteResponse>("http://127.0.0.1:8000/api/route?start=Home&end=Publix");
+        }
+        catch (Exception ex)
+        {
+            // If the server is down, the error can be caught here.
+            Console.WriteLine($"Connection failed: {ex.Message}");
+        }
+
+    }
+}
