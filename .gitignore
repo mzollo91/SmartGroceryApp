@@ -369,6 +369,7 @@ FodyWeavers.xsd
 # ==========================================
 # Ignore the virtual environment
 venv/
+.venv/
 ENV/
 env/
 
