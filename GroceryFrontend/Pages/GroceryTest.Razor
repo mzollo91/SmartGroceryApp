@@ -1,41 +1,128 @@
 @page "/grocerytest"
+@using System.Text.Json
 @inject HttpClient Http
 
-<h3>Backend Connection Test</h3>
+<h3>Grocery Store Optimizer</h3>
 
-@if (routeData==null)
-{
-    <div class = "alert alert-warning">
-        Attempting to reach FastAPI server...
-    </div>
-}
-else
-{
-    <div class="alert alert-success">
-        Connected! Python Backend responded successfully.
-    </div>
-    <div class="card p-3">
-        <h5>Route Details:</h5>
-        <p><strong>Start:</strong> @routeData.StartLocation</p>
-        <p><strong>End:</strong> @routeData.EndLocation</p>
-        <p><strong>Total Distance:</strong> @routeData.TotalDistanceMiles miles</p>
-    </div>
-}
+<div class="container mt-4">
+    @if (aisleLocations==null)
+    {
+        <div class = "alert alert-warning">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Mapping store layout from Python backend...
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="alert alert-success">
+                Connected! Python Backend responded successfully.
+            </div>
+        </div>
+        <div class="row g-3 card p-4 shadow-sm mb-4">
+            <h5>Configure Your Route</h5>
+
+            <div class="row">
+                <div class="col-md-5">
+                    <label for="startLocation" class="form-label"><b>Select Starting Aisle:</b></label>
+                    <select id="startLocation" class="form-control" @bind="selectedStart">
+                        <option value="">-- Choose an Aisle --</option>
+                        @foreach (var location in aisleLocations)
+                        {
+                            <option value="@location">@location</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-5">
+                    <label for="endLocation" class="form-label"><b>Select Ending Aisle:</b></label>
+                    <select id="endLocation" class="form-control" @bind="selectedEnd">
+                        <option value="">-- Choose an Aisle --</option>
+                        @foreach (var location in aisleLocations)
+                        {
+                            <option value="@location">@location</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100"
+                            @onclick="CalculateRoute"
+                            disabled="@(string.IsNullOrEmpty(selectedStart) || string.IsNullOrEmpty(selectedEnd))">
+                        Find Route
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (isSearching)
+    {
+        <div class="text-center p-3">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Running Dijkstra's algorithm on the server...</p>
+        </div>
+    }
+    else if (routeData != null)
+    {
+        <div class="card border-success shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Optimal Route Discovered!</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Start:</strong> @routeData.StartLocation</p>
+                <p><strong>End:</strong> @routeData.EndLocation</p>
+                <p><strong>Total Distance:</strong> @routeData.TotalDistanceMiles miles</p>
+            </div>
+        </div>
+    }
+</div>
 
 @code{
     private RouteResponse? routeData;
+    private List<string>? aisleLocations;
+    
+    // UI Binding States
+    private string? selectedStart;
+    private string? selectedEnd;
+    private bool isSearching = false;
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
             // Call the Python backend from C#.
-            routeData = await Http.GetFromJsonAsync<RouteResponse>("http://127.0.0.1:8000/api/route?start=Home&end=Publix");
+            //routeData = await Http.GetFromJsonAsync<RouteResponse>("http://127.0.0.1:8000/api/route?start=Home&end=Publix");
+            // Initial boot setup: Only grab the map nodes so the UI can draw the selections
+            aisleLocations = await Http.GetFromJsonAsync<List<string>>("http://127.0.0.1:8000/api/aisles/locations");
         }
         catch (Exception ex)
         {
             // If the server is down, the error can be caught here.
             Console.WriteLine($"Connection failed: {ex.Message}");
         }
+    }
+    private async Task CalculateRoute()
+    {
+        if (string.IsNullOrEmpty(selectedStart) || string.IsNullOrEmpty(selectedEnd)) return;
 
+        try
+        {
+            isSearching = true;
+            routeData = null; //Clear old cards out of the view while calculating.
+
+            // Create a safe, dynamic query  string using the variables bound to the dropdowns.
+            string apiUrl = $"http://127.0.0.1:8000/api/route?start={Uri.EscapeDataString(selectedStart)}&end={Uri.EscapeDataString(selectedEnd)}";
+            
+            routeData = await Http.GetFromJsonAsync<RouteResponse>(apiUrl);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Pathfinding calculation failed: {ex.Message}");
+        }
+        finally
+        {
+            isSearching = false;
+        }
     }
 }

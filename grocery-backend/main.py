@@ -35,9 +35,9 @@ def fetch_route(start: str, end: str):
         "stops": sample_route,
         "totalDistanceMiles": 4.2}
 
-@app.get("/api/store/locations")
-def get_store_locations():
+@app.get("/api/aisles/locations")
+def get_all_locations():
     """
     Exposes grocery store locations as a JSON array.
     """
-    return graph.get_store_locations()
+    return graph.get_all_locations()
