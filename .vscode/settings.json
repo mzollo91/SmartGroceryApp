@@ -1,5 +1,7 @@
 {
     "python.analysis.typeCheckingMode": "basic",
+    "python.testing.pytestEnabled": true,
+    "editor.formatOnSave": true,
     "claudeCode.useTerminal": false,
     "python.defaultInterpreterPath": "${workspaceFolder}/grocery-backend/.venv/Scripts/python.exe",
 }

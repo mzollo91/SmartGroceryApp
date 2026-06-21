@@ -6,9 +6,12 @@ bst.insert(5)
 bst.insert(15)
 
 # Checking if pointers are mapped correctly
-print(f"Root: {bst.root.value}")          # Should be 10
-print(f"Left Child: {bst.root.left.value}") # Should be 5
-print(f"Right Child: {bst.root.right.value}") # Should be 15
+if bst.root is not None:
+    print(f"Root: {bst.root.value}")          # Should be 10
+    if bst.root.left is not None:
+        print(f"Left Child: {bst.root.left.value}") # Should be 5
+    if bst.root.right is not None:
+        print(f"Right Child: {bst.root.right.value}") # Should be 15
 			
 # Setup your test tree
 bst = BinarySearchTree()
