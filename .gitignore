@@ -401,4 +401,4 @@ __pycache__/
 *.blazor.config
 
 # Visual Studio Code
-.vscode\
+.vscode/
