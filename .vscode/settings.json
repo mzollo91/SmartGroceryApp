@@ -1,5 +1,0 @@
-{
-    "python.analysis.typeCheckingMode": "basic",
-    "claudeCode.useTerminal": false,
-    "python.defaultInterpreterPath": "${workspaceFolder}/grocery-backend/.venv/Scripts/python.exe",
-}
