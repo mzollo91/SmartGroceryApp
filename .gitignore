@@ -399,3 +399,6 @@ __pycache__/
 # .NET Core / WebAssembly build artifacts
 .json
 *.blazor.config
+
+# Visual Studio Code
+.vscode\
