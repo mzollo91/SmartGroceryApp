@@ -403,3 +403,21 @@ __pycache__/
 # Visual Studio Code
 .vscode/
 vscode/
+
+# Adding %LOCALAPPDATA% folder that is from GitHub Copilot Extension.
+%LOCALAPPDATA%
+%LOCALAPPDATA%/
+grocery-backend/%LOCALAPPDATA%/
+grocery-backend/%LOCALAPPDATA%
+grocery-backend/.venv/
+grocery-backend/.venv
+
+grocery-backend/__pycache__/
+grocery-backend/__pycache__
+
+GroceryFrontend/%LOCALAPPDATA%/
+GroceryFrontend/%LOCALAPPDATA%
+GroceryFrontend/bin/
+GroceryFrontend/bin
+GroceryFrontend/obj/
+GroceryFrontend/obj
