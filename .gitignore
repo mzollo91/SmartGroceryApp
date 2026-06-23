@@ -407,6 +407,8 @@ vscode/
 # Adding %LOCALAPPDATA% folder that is from GitHub Copilot Extension.
 %LOCALAPPDATA%
 %LOCALAPPDATA%/
+
+# Adding subfolders for grocery-backend and GroceryFrontend projects to ignore local app data, virtual environments, and build artifacts.
 grocery-backend/%LOCALAPPDATA%/
 grocery-backend/%LOCALAPPDATA%
 grocery-backend/.venv/
