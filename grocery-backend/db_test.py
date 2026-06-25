@@ -12,14 +12,16 @@ async def init_db():
 
 def test_connection():
     try:
-        conn = sqlite3.connect('grocery.db')
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        for table in tables:
-            print(table)
-            table_info = cursor.execute("PRAGMA table_info()")
-            print(table_info)
+        with sqlite3.connect('grocery.db') as conn: # Use the 'with' block to guarantee that the connection closes at the end, even if an exception is thrown partway.
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = cursor.fetchall()
+            for table in tables:
+                print(f"Table: {table[0]}")
+                columns = cursor.fetchall()
+                print(f"\nAvailable Columns:")
+                for column in columns:
+                    print(column[1])
         
     except Exception as e:
         print(f"Error connecting to the database: {e}")
