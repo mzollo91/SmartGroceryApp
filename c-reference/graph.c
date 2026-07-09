@@ -1,5 +1,6 @@
 #include "graph.h"
 #include <string.h>
+#include <stdlib.h>
 
 Graph *create_graph(size_t capacity)
 {
@@ -57,7 +58,13 @@ bool add_node(Graph *g, int id, const char name[])
     // Creating a new node will lead to a node allocated in memory that will never be used if g->nodeArr[g->nodeCount] = *n
     // is used. Using *n dereferences it, copying the whole struct by value.
     Node *n = &g->nodeArr[g->nodeCount];
-    // Placeholder comment to add duplicate id check later.
+
+    if (get_node_ptr(g, id) != NULL) // The rule of thumb: '&' is for turning a value into a pointer.
+    {
+        fprintf(stderr, "Add Node Error: %s\n", "Node ID already exists.");
+        return false;
+    }
+
     n->id = id;
 
     // Cap strncopy to limit the number of characters to the size of n->aisleName - 1 to leave room for the \0 null terminator.
@@ -68,4 +75,81 @@ bool add_node(Graph *g, int id, const char name[])
 
     g->nodeCount++;
     return true;
+}
+
+Node *get_node_ptr(Graph *g, int id)
+{
+    for (int i = 0; i < g->nodeCount; i++)
+    {
+        Node *n = &g->nodeArr[i];
+        if (id == n->id)
+        {
+            return n;
+        }
+    }
+    return NULL;
+}
+
+bool add_edge(Graph *g, int id1, int id2, float distance)
+{
+    Node *n1 = get_node_ptr(g, id1);
+    Node *n2 = get_node_ptr(g, id2);
+
+    if (n1 == NULL || n2 == NULL)
+    {
+        if (n1 == NULL)
+        {
+            fprintf(stderr, "Node Error: %s\n", "Node 1 ID not found.");
+        }
+        if (n2 == NULL)
+        {
+            fprintf(stderr, "Node Error: %s\n", "Node 2 ID not found.");
+        }
+        return false;
+    }
+
+    Edge *aToB = malloc(sizeof(Edge));
+    Edge *bToA = malloc(sizeof(Edge));
+
+    if (aToB == NULL || bToA == NULL)
+    {
+        if (aToB == NULL)
+        {
+            fprintf(stderr, "Edge Error: %s\n", "Malloc call failed for Edge A->B.");
+        }
+        if (bToA == NULL)
+        {
+            fprintf(stderr, "Edge Error: %s\n", "Malloc call failed for Edge B->A.");
+        }
+        free(aToB); // Free both regardless of which is NULL, since free() can't fail if the pointer is null.
+        free(bToA);
+        return false;
+    }
+
+    aToB->distance = distance;
+    aToB->neighborID = id2;
+    aToB->next = n1->head; // 1: new edge points at whatever head currently is
+    n1->head = aToB;       // 2: head now points at the new edge
+
+    bToA->distance = distance;
+    bToA->neighborID = id1;
+    bToA->next = n2->head;
+    n2->head = bToA;
+
+    return true;
+}
+
+void print_graph(Graph *g)
+{
+    for (int i = 0; i < g->nodeCount; i++)
+    {
+        Node *n = &g->nodeArr[i];
+        Edge *current = n->head;
+        printf("Edge neighbor IDs and distances for Node ID %d:\n", n->id);
+        while (current != NULL)
+        {
+            printf("Neighbor ID: %d\n Distance(ft): %.2f\n", current->neighborID, current->distance);
+            current = current->next;
+        }
+    }
 }
