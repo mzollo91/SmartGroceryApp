@@ -29,3 +29,4 @@ class Edge(Base):
 
     aisle_a = relationship("Aisle", foreign_keys=[aisle_a_id])
     aisle_b = relationship("Aisle", foreign_keys=[aisle_b_id])
+    distance = Column(Float, nullable=False)

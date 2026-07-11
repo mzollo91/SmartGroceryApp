@@ -18,6 +18,7 @@ def test_connection():
             tables = cursor.fetchall()
             for table in tables:
                 print(f"Table: {table[0]}")
+                cursor.execute(f"PRAGMA table_info({table[0]})")
                 columns = cursor.fetchall()
                 print(f"\nAvailable Columns:")
                 for column in columns:
