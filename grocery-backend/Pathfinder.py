@@ -1,41 +1,40 @@
 from collections import defaultdict
 import heapq
 
-from networkx import predecessor
-
 class Pathfinder:
-    def __init__(self, db_manager):
-        self.db = db_manager
+    def __init__(self, distance_repo):
+        self.dr = distance_repo
         self.adj_list = defaultdict(list)
 
-    def refresh_graph(self):
-        # Fetches all distances to build adjaceny list.
-        distances = self.db.get_all_distances()
+    async def refresh_graph(self, session, store_id):
+        """Fetches all distances to build adjaceny list."""
+        edges = await self.dr.get_all_for_store(session=session, store_id=store_id)
 
         # Clear the old graph if it exists.
         self.adj_list = defaultdict(list)
     
-        for dist in distances:
-            self.adj_list[dist.store_a_name].append((dist.store_b_name,dist.travel_distance_minutes))
+        for edge in edges:
+            self.adj_list[edge.aisle_a_id].append((edge.aisle_b_id,edge.distance))
+            self.adj_list[edge.aisle_b_id].append((edge.aisle_a_id,edge.distance))
 
         return self.adj_list
 
-    def reconstruct_path(self, predeccors, start_node, end_node):
+    def reconstruct_path(self, predecessors, start_node_id, end_node_id):
         """
-        Traces back from the end_node to the start_node using the predecessors dictionary, then reverses it for the user.
+        Traces back from the end_node_id to the start_node_id using the predecessors dictionary, then reverses it for the user.
         """
         
         path = []
-        current = end_node
+        current = end_node_id
         # Backtrack: End -> Start
         while current is not None:
             path.append(current)
-            if current == start_node:
+            if current == start_node_id:
                 break
-            current = predeccors.get(current)
+            current = predecessors.get(current)
 
-        # Validation: If the last node isn''t the start , there's no path.
-        if not path or path[-1] != start_node:
+        # Validation: If the last node isn't the start , there's no path.
+        if not path or path[-1] != start_node_id:
             return []
 
         # Reverse to get Start -> End
@@ -97,6 +96,3 @@ class Pathfinder:
                 return [], float('inf')
 
             return path, total_time
-                
-
-

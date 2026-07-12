@@ -1,11 +1,10 @@
 """Repo for interacting with the 'edges' table in the database."""
 
-from database import engine
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from models import Edge, Aisle
 
-class DistanceRepo:
+class DistanceRepository:
     # def __init__(self, session: AsyncSession):
     #     """Establish the async session upon initialization"""
     #     self.session = session

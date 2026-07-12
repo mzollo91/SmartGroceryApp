@@ -68,7 +68,7 @@ class GroceryStoreGraph:
 
 	def map_initialize(self) -> None:
 		"""
-		AN initial seed of the map.
+		An initial seed of the map.
 		"""
 		locations = ["Bakery",
 				 "Produce",

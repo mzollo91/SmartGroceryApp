@@ -2,10 +2,10 @@
 
 import asyncio
 from database import AsyncSessionLocal
-from DistanceRepository import DistanceRepo
+from DistanceRepository import DistanceRepository
 
 async def print_edge_info():
-    dr = DistanceRepo()
+    dr = DistanceRepository()
     try:
         async with AsyncSessionLocal() as session:
             edges = await dr.get_all_for_store(session=session, store_id=1) # Store ID verified using SQLite Viewer
