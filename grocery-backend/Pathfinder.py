@@ -40,59 +40,59 @@ class Pathfinder:
         # Reverse to get Start -> End
         return path[::-1]
 
-    def find_shortest_path(self, start_node, end_node):
+    async def find_shortest_path(self, start_node_id, end_node_id, session, store_id): # Since this function calls refresh_graph internally, which is an async function, it must also be declared as async.
         """
         Djykstra's algorithm to find the shortest path between two nodes in a graph.
-        This translates to finding the shortest travel time between two stores based on the distances in the database.
-        Returns a tuple.
+        This translates to finding the shortest travel weight between two stores based on the distances in the database.
+        Returns a tuple. The term 'weight' used in the algorithm can refer to distance or time, depending on the caller.
         """
 
         # Refresh the graph from the DB to ensure we have the latest distances.
-        adj_list = self.refresh_graph()
+        adj_list = await self.refresh_graph(session=session, store_id=store_id)
 
         # Priority queue: stores tuples of (cumulative_minutes, current_node)
         # Python min-heaps sort by the first element of the tuple automatically.
 
-        pq = [(0, start_node)]
+        pq = [(0, start_node_id)]
 
         # Creating some bookeeping structures:
-        distances = {start_node: 0}
-        predecessors = {start_node: None}
+        distances = {start_node_id: 0}
+        predecessors = {start_node_id: None}
         visited = set()
 
         # The core djykstra's loop:
 
         while pq:
-            current_time, current_node = heapq.heappop(pq)
-            # If we pooped the destination, we can stop and reconstruct the path.
-            if current_node == end_node:
+            current_weight, current_node_id = heapq.heappop(pq)
+            # If we popped the destination, we can stop and reconstruct the path.
+            if current_node_id == end_node_id:
                 break
             # If we've already finalized this node, skip it.
-            if current_node in visited:
+            if current_node_id in visited:
                 continue
 
-            visited.add(current_node)
+            visited.add(current_node_id)
 
             # Explore the neighbors of the current node:
-            for neighbor, travel_time in adj_list[current_node]:
+            for neighbor, travel_weight in adj_list[current_node_id]:
                 if neighbor in visited:
                     continue
 
-                # Calculate the new cumulative time to reach this neighbor through the current node.
-                new_time = current_time + travel_time
+                # Calculate the new cumulative weight to reach this neighbor through the current node.
+                new_weight = current_weight + travel_weight
 
                 # Relaxtion step: if this path to the neighbor is better, update our structures.
-                if neighbor not in distances or new_time < distances[neighbor]:
-                    distances[neighbor] = new_time
-                    predecessors[neighbor] = current_node # Leave a breadcrumb.
-                    heapq.heappush(pq, (new_time, neighbor))
+                if neighbor not in distances or new_weight < distances[neighbor]:
+                    distances[neighbor] = new_weight
+                    predecessors[neighbor] = current_node_id # Leave a breadcrumb.
+                    heapq.heappush(pq, (new_weight, neighbor))
 
-            # Path reconstruction and output:
-            path = self.reconstruct_path(predecessors, start_node, end_node)
-            total_time = distances.get(end_node, float('inf'))
+        # Path reconstruction and output:
+        path = self.reconstruct_path(predecessors, start_node_id, end_node_id)
+        total_weight = distances.get(end_node_id, float('inf'))
 
-            # If the destination is unreachable, return an empty path and infinite cost.
-            if total_time == float('inf'):
-                return [], float('inf')
+        # If the destination is unreachable, return an empty path and infinite cost.
+        if total_weight == float('inf'):
+            return [], float('inf')
 
-            return path, total_time
+        return path, total_weight
