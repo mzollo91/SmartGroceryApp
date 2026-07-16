@@ -4,7 +4,7 @@ from graph import GroceryStoreGraph
 from DistanceRepository import DistanceRepository
 from AisleRepository import AisleRepository
 from Pathfinder import Pathfinder
-import asyncio
+import math
 from database import AsyncSessionLocal
 
 app = FastAPI()
@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 @app.get("/api/route")
-async def fetch_route(start_id: int, end_id: int, store_id: int):
+async def fetch_route(start_id: int, end_id: int):
 
     dr = DistanceRepository()
     ar = AisleRepository()
@@ -41,23 +41,35 @@ async def fetch_route(start_id: int, end_id: int, store_id: int):
         if not aisle_a or not aisle_b:
             errors = []
             if not aisle_a:
-                errors.append("Aisle A ID does not exist.")
+                errors.append(start_id)
             if not aisle_b:
-                errors.append("Aisle B ID does not exist.")
+                errors.append(end_id)
             
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=errors
-            ) 
+            )
+        
+        if aisle_a.store_id != aisle_b.store_id:
+            error_dict = {
+                aisle_a.id: aisle_a.store_id,
+                aisle_b.id: aisle_b.store_id
+            }
+
+            raise HTTPException(
+                status_code= status.HTTP_400_BAD_REQUEST,
+                detail=error_dict
+            )
+        
+        store_id = aisle_a.store_id
             
         path, total_distance = await pf.find_shortest_path(start_node_id=start_id, end_node_id=end_id, session=session,store_id=store_id)
-        sample_route = [start_id, "Store_A", "Store_B", end_id]
 
     return {
         "startLocation": start_id,
         "endLocation": end_id,
-        "stops": path,
-        "totalDistanceFeet": total_distance}
+        "path": path,
+        "totalDistanceFeet": total_distance if not math.isinf(total_distance) else None}
 
 @app.get("/api/aisles/locations")
 def get_all_locations():
