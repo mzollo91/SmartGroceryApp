@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from graph import GroceryStoreGraph
+from DistanceRepository import DistanceRepository
+from AisleRepository import AisleRepository
+from Pathfinder import Pathfinder
+import asyncio
+from database import AsyncSessionLocal
 
 app = FastAPI()
 
@@ -23,17 +28,36 @@ app.add_middleware(
 )
 
 @app.get("/api/route")
-def fetch_route(start: str, end: str):
-    # This is a dummy placeholder mapping to mimic the Dijkstra output.
-    # Actual class to be imported later.
+async def fetch_route(start_id: int, end_id: int, store_id: int):
 
-    sample_route = [start, "Store_A", "Store_B", end]
+    dr = DistanceRepository()
+    ar = AisleRepository()
+    pf = Pathfinder(distance_repo=dr)
+
+    async with AsyncSessionLocal() as session:
+        aisle_a = await ar.get_aisle(session=session, aisle_id=start_id)
+        aisle_b = await ar.get_aisle(session=session, aisle_id=end_id)
+
+        if not aisle_a or not aisle_b:
+            errors = []
+            if not aisle_a:
+                errors.append("Aisle A ID does not exist.")
+            if not aisle_b:
+                errors.append("Aisle B ID does not exist.")
+            
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=errors
+            ) 
+            
+        path, total_distance = await pf.find_shortest_path(start_node_id=start_id, end_node_id=end_id, session=session,store_id=store_id)
+        sample_route = [start_id, "Store_A", "Store_B", end_id]
 
     return {
-        "startLocation": start,
-        "endLocation": end,
-        "stops": sample_route,
-        "totalDistanceMiles": 4.2}
+        "startLocation": start_id,
+        "endLocation": end_id,
+        "stops": path,
+        "totalDistanceFeet": total_distance}
 
 @app.get("/api/aisles/locations")
 def get_all_locations():

@@ -11,7 +11,7 @@ async def find_shortest_path_test():
     try:
         async with AsyncSessionLocal() as session:
             start_node_id = 1 # Entrance ID in the database
-            end_node_id = 4 # Checkout ID in the database
+            end_node_id = 1 # Checkout ID in the database
             store_id = 1 # Currently only store in the database
 
             path, total_distance = await pf.find_shortest_path(start_node_id=start_node_id, end_node_id=end_node_id, session=session, store_id=store_id)
