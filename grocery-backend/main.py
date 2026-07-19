@@ -1,11 +1,11 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from graph import GroceryStoreGraph
 from DistanceRepository import DistanceRepository
 from AisleRepository import AisleRepository
 from Pathfinder import Pathfinder
 import math
-from database import AsyncSessionLocal
+from database import AsyncSessionLocal, AsyncSession
 
 app = FastAPI()
 
@@ -27,43 +27,48 @@ app.add_middleware(
     allow_headers=["*"], # Allows all headers.
 )
 
-@app.get("/api/route")
-async def fetch_route(start_id: int, end_id: int):
+# Instead of creating a session inline, it can get declared as a parameter separately with the below function
+async def get_session():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+@app.get("/api/route") # As a general note, decorators only apply to the function directly below them.
+async def fetch_route(start_id: int, end_id: int, session: AsyncSession = Depends(get_session)):
 
     dr = DistanceRepository()
     ar = AisleRepository()
     pf = Pathfinder(distance_repo=dr)
 
-    async with AsyncSessionLocal() as session:
-        aisle_a = await ar.get_aisle(session=session, aisle_id=start_id)
-        aisle_b = await ar.get_aisle(session=session, aisle_id=end_id)
+    aisle_a = await ar.get_aisle(session=session, aisle_id=start_id)
+    aisle_b = await ar.get_aisle(session=session, aisle_id=end_id)
 
-        if not aisle_a or not aisle_b:
-            errors = []
-            if not aisle_a:
-                errors.append(start_id)
-            if not aisle_b:
-                errors.append(end_id)
-            
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=errors
-            )
+    if not aisle_a or not aisle_b:
+        errors = []
+        if not aisle_a:
+            errors.append(start_id)
+        if not aisle_b:
+            errors.append(end_id)
         
-        if aisle_a.store_id != aisle_b.store_id:
-            error_dict = {
-                aisle_a.id: aisle_a.store_id,
-                aisle_b.id: aisle_b.store_id
-            }
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=errors
+        )
+    
+    if aisle_a.store_id != aisle_b.store_id:
+        error_dict = {
+            aisle_a.id: aisle_a.store_id,
+            aisle_b.id: aisle_b.store_id
+        }
 
-            raise HTTPException(
-                status_code= status.HTTP_400_BAD_REQUEST,
-                detail=error_dict
-            )
+        raise HTTPException(
+            status_code= status.HTTP_400_BAD_REQUEST,
+            detail=error_dict
+        )
+    
+    store_id = aisle_a.store_id
         
-        store_id = aisle_a.store_id
-            
-        path, total_distance = await pf.find_shortest_path(start_node_id=start_id, end_node_id=end_id, session=session,store_id=store_id)
+    path, total_distance = await pf.find_shortest_path(start_node_id=start_id, end_node_id=end_id, session=session,store_id=store_id)
 
     return {
         "startLocation": start_id,
