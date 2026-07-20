@@ -1,11 +1,11 @@
 """Module to create the schema for the test db."""
 
 import asyncio
-from test_db_engine import engine, Base
+#from test_db_engine import engine, Base
 import models # Python must execute the class for the table to be defined. Executing this line accomplishes this.
 import sqlite3
 
-async def init_db():
+async def init_db(engine, Base):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("Tables created successfully.")
@@ -27,6 +27,6 @@ def test_connection():
     except Exception as e:
         print(f"Error connecting to the database: {e}")
 
-if __name__ == "__main__":
-    #asyncio.run(init_db())
-    test_connection()
+# if __name__ == "__main__":
+#     asyncio.run(init_db())
+#     test_connection()
