@@ -16,7 +16,7 @@ origins = [
 
 # Instantiate the graph right after the FastAPI "app". The graph needs to stay alive in the servers memory but outside of any functions.
 graph = GroceryStoreGraph()
-graph.map_initialize()
+#graph.map_initialize()
 
 # Enable CORS so the Blazor frontend can access the API and local server.
 app.add_middleware(

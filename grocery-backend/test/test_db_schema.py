@@ -1,16 +1,21 @@
 """Module to create the schema for the test db."""
 
-import asyncio
-#from test_db_engine import engine, Base
-import models # Python must execute the class for the table to be defined. Executing this line accomplishes this.
 import sqlite3
+import os
+import sys
+
+# Using the production 'models' module, the parent directory needs to be added to the search path.
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) # parent directory one level up.
+sys.path.insert(0,parent_dir) # Use '0' to check the parent directory first.
+
+import models # Python must execute the class for the table to be defined. Executing this line accomplishes this.
 
 async def init_db(engine, Base):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("Tables created successfully.")
 
-def test_connection():
+def try_connection():
     try:
         with sqlite3.connect('test_grocery.db') as conn: # Use the 'with' block to guarantee that the connection closes at the end, even if an exception is thrown partway.
             cursor = conn.cursor()
@@ -26,7 +31,3 @@ def test_connection():
         
     except Exception as e:
         print(f"Error connecting to the database: {e}")
-
-# if __name__ == "__main__":
-#     asyncio.run(init_db())
-#     test_connection()

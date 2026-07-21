@@ -1,5 +1,4 @@
 """Test fixture for api calls."""
-
 import pytest, pytest_asyncio
 from test_db_schema import init_db
 from test_db_seed_data import seed_test_data

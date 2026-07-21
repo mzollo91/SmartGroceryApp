@@ -1,6 +1,11 @@
 """Module to seed data for the test db."""
-import asyncio
-#from test_db_engine import AsyncSessionLocal
+import os
+import sys
+
+# Using the production 'models' module, the parent directory needs to be added to the search path.
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) # parent directory one level up.
+sys.path.insert(0,parent_dir) # Use '0' to check the parent directory first.
+
 from models import Store, Aisle, Edge
 
 async def seed_test_data(session):
@@ -42,6 +47,3 @@ async def seed_test_data(session):
     await session.commit()
     print(f"Seeded store '{store_a.name}' with 4 aisles (1 isolated) and 3 edges.")
     print(f"Seeded store '{store_b.name}' with 2 aisles and 1 edge.")
-
-#if __name__ == "__main__":
-#    asyncio.run(seed_test_data())
