@@ -3,9 +3,16 @@ import pytest, pytest_asyncio
 from test_db_schema import init_db
 from test_db_seed_data import seed_test_data
 from fastapi.testclient import TestClient
-from main import app, get_session
 from test_db_engine import AsyncSessionLocal, engine, Base # If I am importing initially here, all methods and functions are already stored in Python's cache. Importing engine, Base later in the code does not bring them in at that time.
 from pathlib import Path
+import os
+import sys
+
+# Using the production 'models' module, the parent directory needs to be added to the search path.
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) # parent directory one level up.
+sys.path.insert(0,parent_dir) # Use '0' to check the parent directory first.
+
+from main import app, get_session
 
 async def get_test_session():
     async with AsyncSessionLocal() as session:
@@ -15,7 +22,8 @@ async def get_test_session():
 @pytest_asyncio.fixture(scope="session",loop_scope="session")
 async def import_engine():
     # Database must be created first. Delete the original, if it exists.
-    db_path = Path("test_grocery.db")
+    current_dir = Path(__file__).resolve().parent
+    db_path = current_dir / "test_grocery.db"
     db_path.unlink(missing_ok=True)
 
     # Only the engine object needs to be passed to the next fixture. A local session is created outside of the chain to align with FastAPI's injection method in the override_dependencies fixture.

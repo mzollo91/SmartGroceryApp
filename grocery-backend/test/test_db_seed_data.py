@@ -1,12 +1,6 @@
 """Module to seed data for the test db."""
-import os
-import sys
 
-# Using the production 'models' module, the parent directory needs to be added to the search path.
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) # parent directory one level up.
-sys.path.insert(0,parent_dir) # Use '0' to check the parent directory first.
-
-from models import Store, Aisle, Edge
+from test_models import Store, Aisle, Edge
 
 async def seed_test_data(session):
 
@@ -26,7 +20,6 @@ async def seed_test_data(session):
     edges_a = [
         Edge(aisle_a_id=entrance_a.id, aisle_b_id=produce_a.id, distance=5.0),
         Edge(aisle_a_id=produce_a.id, aisle_b_id=checkout_a.id, distance=3.0),
-        Edge(aisle_a_id=entrance_a.id, aisle_b_id=checkout_a.id, distance=4.0),
     ]
     session.add_all(edges_a)
 

@@ -1,14 +1,7 @@
 """Module to create the schema for the test db."""
 
 import sqlite3
-import os
-import sys
-
-# Using the production 'models' module, the parent directory needs to be added to the search path.
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) # parent directory one level up.
-sys.path.insert(0,parent_dir) # Use '0' to check the parent directory first.
-
-import models # Python must execute the class for the table to be defined. Executing this line accomplishes this.
+import test_models # Python must execute the class for the table to be defined. Executing this line accomplishes this.
 
 async def init_db(engine, Base):
     async with engine.begin() as conn:

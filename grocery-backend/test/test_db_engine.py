@@ -4,8 +4,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from pathlib import Path
 
-DATABASE_URL = "sqlite+aiosqlite:///./test_grocery.db"
+current_dir = Path(__file__).resolve().parent
+db_path = current_dir / "test_grocery.db"
+DATABASE_URL = f"sqlite+aiosqlite:///{db_path.as_posix()}"
 
 # Base is the parent class that every table model will inherit from.
 # It provides the necessary metadata and functionality for SQLAlchemy to work with the database.
