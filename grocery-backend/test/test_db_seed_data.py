@@ -11,15 +11,18 @@ async def seed_test_data(session):
     entrance_a = Aisle(name="Entrance", store_id=store_a.id)
     produce_a = Aisle(name="Produce", store_id=store_a.id)
     dairy_a = Aisle(name="Dairy", store_id=store_a.id)
+    meat_a = Aisle(name="Meat", store_id=store_a.id)
     checkout_a = Aisle(name="Checkout", store_id=store_a.id)
 
-    session.add_all([entrance_a, produce_a, dairy_a, checkout_a])
+    session.add_all([entrance_a, produce_a, meat_a, dairy_a, checkout_a])
     await session.flush()  # assigns ids to each aisle
     
     # Create edges with one isolated aisle that has no path to it.
     edges_a = [
         Edge(aisle_a_id=entrance_a.id, aisle_b_id=produce_a.id, distance=5.0),
         Edge(aisle_a_id=produce_a.id, aisle_b_id=checkout_a.id, distance=3.0),
+        Edge(aisle_a_id=meat_a.id, aisle_b_id=checkout_a.id, distance=1.0),
+        Edge(aisle_a_id=meat_a.id, aisle_b_id=entrance_a.id, distance=1.0),
     ]
     session.add_all(edges_a)
 
