@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from graph import GroceryStoreGraph
 from DistanceRepository import DistanceRepository
 from AisleRepository import AisleRepository
+from StoreRepository import StoreRepository
 from Pathfinder import Pathfinder
 import math
 from database import AsyncSessionLocal, AsyncSession
@@ -75,6 +76,43 @@ async def fetch_route(start_id: int, end_id: int, session: AsyncSession = Depend
         "endLocation": end_id,
         "path": path,
         "totalDistanceFeet": total_distance if not math.isinf(total_distance) else None}
+
+@app.get("/api/stores")
+async def fetch_all_stores(session: AsyncSession = Depends(get_session)):
+    sr = StoreRepository()
+    all_stores = await sr.get_all_stores(session=session)
+
+    all_store_ids_and_names = [{"id": store.id, "name": store.name} for store in all_stores]
+
+    return {
+        "stores": all_store_ids_and_names,
+    }
+
+@app.get("/api/stores/{store_id}/aisles")
+async def fetch_all_aisles_in_store(store_id: int, session: AsyncSession = Depends(get_session)):
+    
+    sr = StoreRepository()
+    ar = AisleRepository()
+
+    store = await sr.get_store(store_id=store_id, session=session)
+
+    if not store:
+        errors = []
+        errors.append(store_id)
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=errors
+        )
+    
+    aisles = await ar.get_all_aisles_in_store(store_id=store.id, session=session)
+
+    # An empty list is expected for both keys in the dict for a store without and aisles added and is a valid call and will receive a 200 response. The frontend will interpret these empty lists and prompt a message to appear in the UI.
+    all_aisles_ids_and_names = [{"id": aisle.id, "name": aisle.name} for aisle in aisles]
+
+    return {
+        "aisles": all_aisles_ids_and_names,
+    }
 
 @app.get("/api/aisles/locations")
 def get_all_locations():

@@ -416,6 +416,8 @@ grocery-backend/.venv
 
 grocery-backend/__pycache__/
 grocery-backend/__pycache__
+grocery-backend/.pytest_cache/
+grocery-backend/.pytest_cache
 
 GroceryFrontend/%LOCALAPPDATA%/
 GroceryFrontend/%LOCALAPPDATA%

@@ -1,12 +1,11 @@
 """Repo for interacting with the 'aisle' table in the database."""
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from models import Aisle
 
 class AisleRepository:
 
-    async def get_all_aisles(self, session, store_id):
+    async def get_all_aisles_in_store(self, session, store_id):
         # Pull all aisle IDs for a given store.
         statement = select(Aisle).where(Aisle.store_id == store_id)
         result = await session.execute(statement)

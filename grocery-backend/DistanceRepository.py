@@ -1,14 +1,10 @@
 """Repo for interacting with the 'edges' table in the database."""
 
 from sqlalchemy import select, or_
-from sqlalchemy.ext.asyncio import AsyncSession
 from models import Edge, Aisle
 
 class DistanceRepository:
-    # def __init__(self, session: AsyncSession):
-    #     """Establish the async session upon initialization"""
-    #     self.session = session
-
+    
     async def get_all_for_store(self, session, store_id):
         # Pull the aisle IDs for a given store.
         statement = select(Aisle.id).where(Aisle.store_id == store_id)
