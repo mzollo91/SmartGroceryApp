@@ -107,7 +107,7 @@ async def fetch_all_aisles_in_store(store_id: int, session: AsyncSession = Depen
     
     aisles = await ar.get_all_aisles_in_store(store_id=store.id, session=session)
 
-    # An empty list is expected for both keys in the dict for a store without and aisles added and is a valid call and will receive a 200 response. The frontend will interpret these empty lists and prompt a message to appear in the UI.
+    # An empty list is expected for a store without and aisles added and is a valid call and will receive a 200 response. The frontend will interpret this empty list and prompt a message to appear in the UI.
     all_aisles_ids_and_names = [{"id": aisle.id, "name": aisle.name} for aisle in aisles]
 
     return {

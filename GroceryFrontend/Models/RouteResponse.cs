@@ -8,7 +8,5 @@ public class RouteResponse
     public int EndLocation { get; set; }
     public List<int> Path { get; set; } = new();
     public double? TotalDistanceFeet { get; set; }
-    public Dictionary<int, string> Stores { get; set; } = new();
-    public Dictionary<int, string> Aisle { get; set; } = new();
 
 }

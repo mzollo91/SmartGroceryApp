@@ -5,7 +5,7 @@
 <h3>Grocery Store Optimizer</h3>
 
 <div class="container mt-4">
-    @if (aisleLocations==null)
+    @if (stores==null)
     {
         <div class = "alert alert-warning">
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -21,39 +21,50 @@
         </div>
         <div class="row g-3 card p-4 shadow-sm mb-4">
             <h5>Configure Your Route</h5>
-
             <div class="row">
                 <div class="col-md-5">
-                    <label for="startLocation" class="form-label"><b>Select Starting Aisle:</b></label>
-                    <select id="startLocation" class="form-control" @bind="selectedStart">
+                    <label for="selectedStoreId" class="form-label"><b>Select a Store:</b></label>
+                    <select id="selectedStoreId" class="form-control" @bind="selectedStoreId">
                         <option value="">-- Choose an Aisle --</option>
-                        @foreach (var location in aisleLocations)
+                        @foreach (var store in stores)
                         {
-                            <option value="@location">@location</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="col-md-5">
-                    <label for="endLocation" class="form-label"><b>Select Ending Aisle:</b></label>
-                    <select id="endLocation" class="form-control" @bind="selectedEnd">
-                        <option value="">-- Choose an Aisle --</option>
-                        @foreach (var location in aisleLocations)
-                        {
-                            <option value="@location">@location</option>
+                            <option value="@store">@store</option>
                         }
                     </select>
                 </div>
             </div>
             <div class="row">
+                @* <div class="col-md-5">
+                    <label for="startLocationId" class="form-label"><b>Select Starting Aisle:</b></label>
+                    <select id="startLocationId" class="form-control" @bind="selectedStartId">
+                        <option value="">-- Choose an Aisle --</option>
+                        @foreach (var location in aisleLocations)
+                        {
+                            <option value="@location">@location</option>
+                        }
+                    </select>
+                </div> *@
+
+                @* <div class="col-md-5">
+                    <label for="endLocationId" class="form-label"><b>Select Ending Aisle:</b></label>
+                    <select id="endLocationId" class="form-control" @bind="selectedEndId">
+                        <option value="">-- Choose an Aisle --</option>
+                        @foreach (var location in aisleLocations)
+                        {
+                            <option value="@location">@location</option>
+                        }
+                    </select>
+                </div> *@
+            </div>
+            @* <div class="row">
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-primary w-100"
                             @onclick="CalculateRoute"
-                            disabled="@(string.IsNullOrEmpty(selectedStart) || string.IsNullOrEmpty(selectedEnd))">
+                            disabled="@(string.IsNullOrEmpty(selectedStartId) || string.IsNullOrEmpty(selectedEndId))">
                         Find Route
                     </button>
                 </div>
-            </div>
+            </div> *@
         </div>
     }
     @if (isSearching)
@@ -72,7 +83,7 @@
             <div class="card-body">
                 <p><strong>Start:</strong> @routeData.StartLocation</p>
                 <p><strong>End:</strong> @routeData.EndLocation</p>
-                <p><strong>Total Distance:</strong> @routeData.TotalDistanceMiles miles</p>
+                <p><strong>Total Distance:</strong> @routeData.TotalDistanceFeet feet</p>
             </div>
         </div>
     }
@@ -80,12 +91,15 @@
 
 @code{
     private RouteResponse? routeData;
-    private List<string>? aisleLocations;
+    private AislesResponse? aisles;
+    private StoresResponse? stores;
     
     // UI Binding States
-    private string? selectedStart;
-    private string? selectedEnd;
+    private int? selectedStartId; // Allow for null if nothing is selected
+    private int? selectedEndId; // Allow for null if nothing is selected
+    private int? selectedStoreId; // Allow for null if nothing is selected
     private bool isSearching = false;
+    private bool isLoadingAisles = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,7 +108,8 @@
             // Call the Python backend from C#.
             //routeData = await Http.GetFromJsonAsync<RouteResponse>("http://127.0.0.1:8000/api/route?start=Home&end=Publix");
             // Initial boot setup: Only grab the map nodes so the UI can draw the selections
-            aisleLocations = await Http.GetFromJsonAsync<List<string>>("http://127.0.0.1:8000/api/aisles/locations");
+            stores = await Http.GetFromJsonAsync<StoresResponse>("http://127.0.0.1:8000/api/stores");
+            //aisleLocations = await Http.GetFromJsonAsync<List<string>>("http://127.0.0.1:8000/api/aisles/locations");
         }
         catch (Exception ex)
         {
@@ -102,9 +117,42 @@
             Console.WriteLine($"Connection failed: {ex.Message}");
         }
     }
+    private async Task SelectStore()
+    {
+        try
+        {
+            // Turn on loading flag.
+            isLoadingAisles = true;
+            
+            // Clear out any existing data in the form.
+            routeData = null;
+            aisles = null;
+            selectedStartId = null;
+            selectedEndId = null;
+
+            if (selectedStoreId == null)
+            {
+                return; // No need to set isLoadingAisles = false here, the finally block will run regardless of the early termination.
+            }
+
+            // A new store is selected, make a call to the database to get the aisles.
+            aisles  = await Http.GetFromJsonAsync<AislesResponse>($"http://127.0.0.1:8000/api/stores/{selectedStoreId}/aisles"); // AislesResponse already has the shape that matches the wrapped shape. No need to use List<AisleDTO>.
+        }
+
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Connection failed: {ex.Message}");
+        }
+
+        finally
+        {
+            isLoadingAisles = false;
+        }
+
+    }
     private async Task CalculateRoute()
     {
-        if (string.IsNullOrEmpty(selectedStart) || string.IsNullOrEmpty(selectedEnd)) return;
+        if (string.IsNullOrEmpty(selectedStartId) || string.IsNullOrEmpty(selectedEndId)) return;
 
         try
         {
