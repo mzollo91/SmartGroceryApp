@@ -24,16 +24,45 @@
             <div class="row">
                 <div class="col-md-5">
                     <label for="selectedStoreId" class="form-label"><b>Select a Store:</b></label>
-                    <select id="selectedStoreId" class="form-control" @bind="selectedStoreId">
-                        <option value="">-- Choose an Aisle --</option>
-                        @foreach (var store in stores)
+                    <select id="selectedStoreId" class="form-control" @bind="selectedStoreId" @bind:after="SelectStore">
+                        <option value="">-- Choose an Store --</option>
+                        @foreach (StoreDTO store in stores.Stores)
                         {
-                            <option value="@store">@store</option>
+                            <option value="@store.Id">@store.Name</option>
                         }
                     </select>
                 </div>
             </div>
             <div class="row">
+                <div class="col-md-5">
+                    <label for="selectedStartId" class="form-label"><b>Select a Starting Aisle:</b></label>
+                    <select id="selectedStartId" class="form-control" @bind="selectedStartId" disabled="@(isLoadingAisles ? "disabled" : null)">
+                        
+                        @if (aisles != null)
+                        {
+                            <option value="">-- Choose an Aisle --</option>
+                            @foreach (AisleDTO aisle in aisles.Aisles)
+                            {
+                                
+                                <option value="@aisle.Id">@aisle.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            @if (selectedStoreId == null)
+                            {
+                                <option value="">--Store must be selected first--</option>
+                                <option disabled>No Store Selected...</option>
+                            }
+                            else if (aisles.Aisles is not [] && isLoadingAisles)
+                            {
+                                <option value="">--No Aisles Available--</option>
+                                <option disabled>Aisles Loading...</option>
+                            }
+                        }
+
+                    </select>
+                </div>
                 @* <div class="col-md-5">
                     <label for="startLocationId" class="form-label"><b>Select Starting Aisle:</b></label>
                     <select id="startLocationId" class="form-control" @bind="selectedStartId">
@@ -152,7 +181,7 @@
     }
     private async Task CalculateRoute()
     {
-        if (string.IsNullOrEmpty(selectedStartId) || string.IsNullOrEmpty(selectedEndId)) return;
+        if (selectedStartId is null || selectedEndId is null) return;
 
         try
         {
@@ -160,9 +189,9 @@
             routeData = null; //Clear old cards out of the view while calculating.
 
             // Create a safe, dynamic query  string using the variables bound to the dropdowns.
-            string apiUrl = $"http://127.0.0.1:8000/api/route?start={Uri.EscapeDataString(selectedStart)}&end={Uri.EscapeDataString(selectedEnd)}";
+            //string apiUrl = $"http://127.0.0.1:8000/api/route?start={Uri.EscapeDataString(selectedStartId)}&end={Uri.EscapeDataString(selectedEndId)}";
             
-            routeData = await Http.GetFromJsonAsync<RouteResponse>(apiUrl);
+            //routeData = await Http.GetFromJsonAsync<RouteResponse>(apiUrl);
         }
         catch (Exception ex)
         {
