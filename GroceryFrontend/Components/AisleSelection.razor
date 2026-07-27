@@ -1,0 +1,22 @@
+@code {
+
+    // C# convention is to use pascal case for public properties.
+    [Parameter]
+    public List<AisleDTO>? Aisles { get; set; } // A null value is needed for the logic check, this does not need to have a new list initialized.
+
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ElementId { get; set; } = string.Empty; // ElementId is the label for the <select> tag, thus it needs to be a string.
+
+    [Parameter]
+    public bool IsLoadingAisles { get; set; } = false;
+
+    [Parameter]
+    public int? Value { get; set; } // Setting type as int because the Ids of the aisles are what needs to be passed back to the parent component.
+
+    [Parameter]
+    public EventCallback<int?> ValueChanged { get; set; } // Since 'Value' is int? to match the type of the aisle IDs, the type specified in EventCallback<T> must match.
+
+}
