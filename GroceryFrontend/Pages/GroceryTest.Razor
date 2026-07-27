@@ -40,11 +40,17 @@
                         
                         @if (aisles != null)
                         {
-                            <option value="">-- Choose an Aisle --</option>
-                            @foreach (AisleDTO aisle in aisles.Aisles)
+                            @if(aisles.Aisles is [] && !isLoadingAisles)
                             {
-                                
-                                <option value="@aisle.Id">@aisle.Name</option>
+                                <option value="">--No Aisles Available--</option>
+                            }
+                            else
+                            {
+                                <option value="">-- Choose an Aisle --</option>
+                                @foreach (AisleDTO aisle in aisles.Aisles)
+                                {            
+                                    <option value="@aisle.Id">@aisle.Name</option>
+                                }
                             }
                         }
                         else
@@ -52,48 +58,58 @@
                             @if (selectedStoreId == null)
                             {
                                 <option value="">--Store must be selected first--</option>
-                                <option disabled>No Store Selected...</option>
                             }
-                            else if (aisles.Aisles is not [] && isLoadingAisles)
+                            else
                             {
-                                <option value="">--No Aisles Available--</option>
-                                <option disabled>Aisles Loading...</option>
+                                <option value="">--Database Connection Error!--</option> 
                             }
                         }
 
                     </select>
                 </div>
-                @* <div class="col-md-5">
-                    <label for="startLocationId" class="form-label"><b>Select Starting Aisle:</b></label>
-                    <select id="startLocationId" class="form-control" @bind="selectedStartId">
-                        <option value="">-- Choose an Aisle --</option>
-                        @foreach (var location in aisleLocations)
+                <div class="col-md-5">
+                    <label for="selectedEndId" class="form-label"><b>Select an Ending Aisle:</b></label>
+                    <select id="selectedEndId" class="form-control" @bind="selectedEndId" disabled="@(isLoadingAisles ? "disabled" : null)">
+                        
+                        @if (aisles != null)
                         {
-                            <option value="@location">@location</option>
+                            @if(aisles.Aisles is [] && !isLoadingAisles)
+                            {
+                                <option value="">--No Aisles Available--</option>
+                            }
+                            else
+                            {
+                                <option value="">-- Choose an Aisle --</option>
+                                @foreach (AisleDTO aisle in aisles.Aisles)
+                                {            
+                                    <option value="@aisle.Id">@aisle.Name</option>
+                                }
+                            }
                         }
-                    </select>
-                </div> *@
+                        else
+                        {
+                            @if (selectedStoreId == null)
+                            {
+                                <option value="">--Store must be selected first--</option>
+                            }
+                            else
+                            {
+                                <option value="">--Database Connection Error!--</option> 
+                            }
+                        }
 
-                @* <div class="col-md-5">
-                    <label for="endLocationId" class="form-label"><b>Select Ending Aisle:</b></label>
-                    <select id="endLocationId" class="form-control" @bind="selectedEndId">
-                        <option value="">-- Choose an Aisle --</option>
-                        @foreach (var location in aisleLocations)
-                        {
-                            <option value="@location">@location</option>
-                        }
                     </select>
-                </div> *@
+                </div>
             </div>
-            @* <div class="row">
+            <div class="row">
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-primary w-100"
                             @onclick="CalculateRoute"
-                            disabled="@(string.IsNullOrEmpty(selectedStartId) || string.IsNullOrEmpty(selectedEndId))">
+                            disabled="@(selectedStartId == null || selectedEndId == null)">
                         Find Route
                     </button>
                 </div>
-            </div> *@
+            </div>
         </div>
     }
     @if (isSearching)
