@@ -5,9 +5,9 @@
 <h3>Grocery Store Optimizer</h3>
 
 <div class="container mt-4">
-    @if (stores==null)
+    @if (stores == null)
     {
-        <div class = "alert alert-warning">
+        <div class="alert alert-warning">
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Mapping store layout from Python backend...
         </div>
@@ -21,7 +21,7 @@
         </div>
         <div class="row g-3 card p-4 shadow-sm mb-4">
             <h5>Configure Your Route</h5>
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col-md-5">
                     <label for="selectedStoreId" class="form-label"><b>Select a Store:</b></label>
                     <select id="selectedStoreId" class="form-control" @bind="selectedStoreId" @bind:after="SelectStore">
@@ -33,78 +33,23 @@
                     </select>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col-md-5">
-                    <label for="selectedStartId" class="form-label"><b>Select a Starting Aisle:</b></label>
-                    <select id="selectedStartId" class="form-control" @bind="selectedStartId" disabled="@(isLoadingAisles ? "disabled" : null)">
-                        
-                        @if (aisles != null)
-                        {
-                            @if(aisles.Aisles is [] && !isLoadingAisles)
-                            {
-                                <option value="">--No Aisles Available--</option>
-                            }
-                            else
-                            {
-                                <option value="">-- Choose an Aisle --</option>
-                                @foreach (AisleDTO aisle in aisles.Aisles)
-                                {            
-                                    <option value="@aisle.Id">@aisle.Name</option>
-                                }
-                            }
-                        }
-                        else
-                        {
-                            @if (selectedStoreId == null)
-                            {
-                                <option value="">--Store must be selected first--</option>
-                            }
-                            else
-                            {
-                                <option value="">--Database Connection Error!--</option> 
-                            }
-                        }
-
-                    </select>
+                    <AisleSelection Label="Select Start Aisle" ElementId="selectedStartId" Aisles="aisles?.Aisles"
+                                    HasStoreSelected="@(selectedStoreId!=null)" IsLoadingAisles="isLoadingAisles"
+                                    @bind-Value="selectedStartId">
+                    </AisleSelection>
                 </div>
                 <div class="col-md-5">
-                    <label for="selectedEndId" class="form-label"><b>Select an Ending Aisle:</b></label>
-                    <select id="selectedEndId" class="form-control" @bind="selectedEndId" disabled="@(isLoadingAisles ? "disabled" : null)">
-                        
-                        @if (aisles != null)
-                        {
-                            @if(aisles.Aisles is [] && !isLoadingAisles)
-                            {
-                                <option value="">--No Aisles Available--</option>
-                            }
-                            else
-                            {
-                                <option value="">-- Choose an Aisle --</option>
-                                @foreach (AisleDTO aisle in aisles.Aisles)
-                                {            
-                                    <option value="@aisle.Id">@aisle.Name</option>
-                                }
-                            }
-                        }
-                        else
-                        {
-                            @if (selectedStoreId == null)
-                            {
-                                <option value="">--Store must be selected first--</option>
-                            }
-                            else
-                            {
-                                <option value="">--Database Connection Error!--</option> 
-                            }
-                        }
-
-                    </select>
+                    <AisleSelection Label="Select End Aisle" ElementId="selectedEndId" Aisles="aisles?.Aisles"
+                                    HasStoreSelected="@(selectedStoreId!=null)" IsLoadingAisles="isLoadingAisles"
+                                    @bind-Value="selectedEndId">
+                    </AisleSelection>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-primary w-100"
-                            @onclick="CalculateRoute"
+                    <button class="btn btn-primary w-100" @onclick="CalculateRoute"
                             disabled="@(selectedStartId == null || selectedEndId == null)">
                         Find Route
                     </button>
@@ -134,11 +79,11 @@
     }
 </div>
 
-@code{
+@code {
     private RouteResponse? routeData;
     private AislesResponse? aisles;
     private StoresResponse? stores;
-    
+
     // UI Binding States
     private int? selectedStartId; // Allow for null if nothing is selected
     private int? selectedEndId; // Allow for null if nothing is selected
@@ -168,7 +113,7 @@
         {
             // Turn on loading flag.
             isLoadingAisles = true;
-            
+
             // Clear out any existing data in the form.
             routeData = null;
             aisles = null;
@@ -181,7 +126,8 @@
             }
 
             // A new store is selected, make a call to the database to get the aisles.
-            aisles  = await Http.GetFromJsonAsync<AislesResponse>($"http://127.0.0.1:8000/api/stores/{selectedStoreId}/aisles"); // AislesResponse already has the shape that matches the wrapped shape. No need to use List<AisleDTO>.
+            aisles = await Http.GetFromJsonAsync<AislesResponse>($"http://127.0.0.1:8000/api/stores/{selectedStoreId}/aisles");
+            //AislesResponse already has the shape that matches the wrapped shape. No need to use List<AisleDTO>.
         }
 
         catch (Exception ex)
@@ -204,9 +150,10 @@
             isSearching = true;
             routeData = null; //Clear old cards out of the view while calculating.
 
-            // Create a safe, dynamic query  string using the variables bound to the dropdowns.
-            //string apiUrl = $"http://127.0.0.1:8000/api/route?start={Uri.EscapeDataString(selectedStartId)}&end={Uri.EscapeDataString(selectedEndId)}";
-            
+            // Create a safe, dynamic query string using the variables bound to the dropdowns.
+            //string apiUrl =
+            //$"http://127.0.0.1:8000/api/route?start={Uri.EscapeDataString(selectedStartId)}&end={Uri.EscapeDataString(selectedEndId)}";
+
             //routeData = await Http.GetFromJsonAsync<RouteResponse>(apiUrl);
         }
         catch (Exception ex)

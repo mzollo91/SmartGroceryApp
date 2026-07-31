@@ -35,7 +35,6 @@
         <option value ="">--Loading Aisles--</option>
     }
 
-
 </select>
 
 @code {
@@ -48,7 +47,7 @@
     public string Label { get; set; } = string.Empty;
 
     [Parameter]
-    public string ElementId { get; set; } = string.Empty; // ElementId is the label for the <select> tag, thus it needs to be a string.
+    public string ElementId { get; set; } = string.Empty; // ElementId is the label for the <select> tag, thus it needs to be a string. This tag is separate the selectedStartId and selectedEndId HTML IDs.
 
     [Parameter]
     public bool IsLoadingAisles { get; set; } = false;
@@ -66,4 +65,6 @@
     {
         await ValueChanged.InvokeAsync(Value); // Required to invoke the EventCallback after the event.
     }
+    @* [Parameter]
+    public RenderFragment? ChildContent {get; set;} *@ // This parameter would be needed if the parent markup contained other HTML content. Since this child is not a fragment, it is not needed.
 }
