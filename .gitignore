@@ -425,3 +425,5 @@ GroceryFrontend/bin/
 GroceryFrontend/bin
 GroceryFrontend/obj/
 GroceryFrontend/obj
+
+*.lnk

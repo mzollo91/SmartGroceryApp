@@ -35,13 +35,13 @@
             </div>
             <div class="row mb-3">
                 <div class="col-md-5">
-                    <AisleSelection Label="Select Start Aisle" ElementId="selectedStartId" Aisles="aisles?.Aisles"
+                    <AisleSelection Label="Select Start Aisle" ElementId="selectedStart" Aisles="aisles?.Aisles"
                                     HasStoreSelected="@(selectedStoreId!=null)" IsLoadingAisles="isLoadingAisles"
                                     @bind-Value="selectedStartId">
                     </AisleSelection>
                 </div>
                 <div class="col-md-5">
-                    <AisleSelection Label="Select End Aisle" ElementId="selectedEndId" Aisles="aisles?.Aisles"
+                    <AisleSelection Label="Select End Aisle" ElementId="selectedEnd" Aisles="aisles?.Aisles"
                                     HasStoreSelected="@(selectedStoreId!=null)" IsLoadingAisles="isLoadingAisles"
                                     @bind-Value="selectedEndId">
                     </AisleSelection>
