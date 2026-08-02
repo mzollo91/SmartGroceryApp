@@ -151,10 +151,18 @@
             routeData = null; //Clear old cards out of the view while calculating.
 
             // Create a safe, dynamic query string using the variables bound to the dropdowns.
-            //string apiUrl =
-            //$"http://127.0.0.1:8000/api/route?start={Uri.EscapeDataString(selectedStartId)}&end={Uri.EscapeDataString(selectedEndId)}";
+            string apiUrl =
+                $"http://127.0.0.1:8000/api/route?start_id={selectedStartId}&end_id={selectedEndId}";
 
-            //routeData = await Http.GetFromJsonAsync<RouteResponse>(apiUrl);
+            routeData = await Http.GetFromJsonAsync<RouteResponse>(apiUrl);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            Console.WriteLine($"Pathfinding calculation failed: {ex.Message}");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            Console.WriteLine($"Pathfinding calculation failed: {ex.Message}");
         }
         catch (Exception ex)
         {
