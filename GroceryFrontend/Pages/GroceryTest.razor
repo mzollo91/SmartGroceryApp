@@ -99,8 +99,6 @@
     private RouteResponse? routeData;
     private AislesResponse? aisles;
     private StoresResponse? stores;
-    private ListErrorResponse? listError;
-    private DictErrorResponse? dictError;
 
     // UI Binding States
     private int? selectedStartId; // Allow for null if nothing is selected
@@ -160,6 +158,8 @@
         }
 
     }
+    // The function below is only clearing existing data out on the page, no call to the database.
+    // This can be a 'void' rather than an 'async Task'.
     private void SelectAisles()
     {
         // Clear out any existing data in the form.
@@ -194,11 +194,7 @@
 
                     if (failedIds != null)
                     {
-                        calcRouteError = $"Aisle ID {failedIds.Detail[0]} does not exist in the database.";
-                        foreach (int id in failedIds.Detail.Skip(1))
-                        {
-                            calcRouteError = calcRouteError + $"\nAisle ID {id} does not exist in the database.";
-                        }
+                        calcRouteError = string.Join("\n", failedIds.Detail.Select(id => $"Aisle ID {id} does not exist in the database."));
                     }
                     else
                     {
@@ -211,20 +207,8 @@
 
                     if (failedIds != null)
                     {
-                        foreach (var (aisles_id, store_id) in failedIds.Detail)
-                        {
-                            if (store_id != selectedStoreId)
-                            {
-                                if (calcRouteError == string.Empty)
-                                {
-                                    calcRouteError = $"Aisle ID {aisles_id} does not belong to the selected store.";
-                                }
-                                else
-                                {
-                                    calcRouteError = calcRouteError + $"\nAisle ID {aisles_id} does not belong to the selected store.";
-                                }
-                            }
-                        }
+                        calcRouteError = string.Join("\n", failedIds.Detail.Select(kvp => $"Aisle ID {kvp.Key} belongs to store ID {kvp.Value}."));
+                        calcRouteError = calcRouteError + "\nStore IDs must match between aisles.";
                     }
                     else
                     {
