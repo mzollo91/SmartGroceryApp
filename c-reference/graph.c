@@ -54,6 +54,12 @@ bool add_node(Graph *g, int id, const char name[])
         fprintf(stderr, "Add Node Error: %s\n", "nodeCount is equal to or greater than capacity");
         return false;
     }
+    // Guard added to ensure that the id falls between 0 and the capacity of the graph.
+    if (id <= 0 || id > g->capacity)
+    {
+        fprintf(stderr, "Add Node Error: %s: %zu\n", "id must fall between the values of 0 and the capacity allocated to the graph.", g->capacity);
+        return false;
+    }
     // There is no need to malloc a new node. The memory allocation already exists in the graph created.
     // Creating a new node will lead to a node allocated in memory that will never be used if g->nodeArr[g->nodeCount] = *n
     // is used. Using *n dereferences it, copying the whole struct by value.

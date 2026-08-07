@@ -192,7 +192,7 @@ int main(void)
     print_graph(g);
     cleanup(g);
 
-    Graph *g2 = create_graph(2);
+    Graph *g2 = create_graph(3);
 
     if (!test_capacity(g2, locations, locationsLength))
     {
