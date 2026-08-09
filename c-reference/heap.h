@@ -17,15 +17,17 @@ typedef struct
 
 typedef struct
 {
-    int totalCount;
+    int nodeCount; // Naming convention kept consistent with graph.h.
     size_t capacity;
-    int *position; // Using a pointer here since C only allows for one flexible member per struct. The array will be fixed of capacity + 1 and sized once at runtime.
-    HeapNode *nodes;
-} MinHeap; // The heap data structure.
+    int *position;   // Using a pointer here since C only allows for one flexible member per struct. The array will be fixed of capacity + 1 and sized once at runtime. The 0 index is unused to match with the numbering scheme of ID.
+    HeapNode *nodes; // nodes will have a fixed size of capacity, indexing starting at 0.
+} MinHeap;           // The heap data structure.
 
 // Shared global variables (extern)
 
 // Function pointers
+MinHeap *create_min_heap(size_t capacity);
+void free_min_heap(MinHeap *mh);
 
 // Function prototypes
 
