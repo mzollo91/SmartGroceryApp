@@ -30,6 +30,7 @@ MinHeap *create_min_heap(size_t capacity);
 void free_min_heap(MinHeap *mh);
 
 // Function prototypes
+void swap(MinHeap *mh, int i, int j);
 
 // End of Include Guard
 #endif

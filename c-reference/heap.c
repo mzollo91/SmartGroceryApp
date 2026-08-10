@@ -37,3 +37,29 @@ MinHeap *create_min_heap(size_t capacity)
 
     return mh;
 }
+
+void free_min_heap(MinHeap *mh)
+{
+    // Since the memory is allocated for the entire array,
+    // it must be freed the same way rather than by individual node.
+    free(mh->nodes);
+    free(mh->position);
+    free(mh);
+}
+
+void swap(MinHeap *mh, int i, int j)
+{
+    // Get node ids
+    int n1 = mh->nodes[i].node_id;
+    int n2 = mh->nodes[j].node_id;
+
+    // Swap the nodes
+    HeapNode tempNode = mh->nodes[i]; // Copy tempNode by value, if it points to the node's memory address then the value of tempNode will be also be overwritten in the next line.
+    mh->nodes[i] = mh->nodes[j];
+    mh->nodes[j] = tempNode;
+
+    // Swap the positions
+    int tempPos = mh->position[n1]; // Same reasoning as tempNode to copy by value.
+    mh->position[n1] = mh->position[n2];
+    mh->position[n2] = tempPos;
+}
