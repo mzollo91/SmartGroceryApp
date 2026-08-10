@@ -63,3 +63,42 @@ void swap(MinHeap *mh, int i, int j)
     mh->position[n1] = mh->position[n2];
     mh->position[n2] = tempPos;
 }
+
+bool insert(MinHeap *mh, int node_id, float key)
+{
+    // Guards against exceeding capacity, node_id values out of bounds, and inserting duplicate nodes.
+    if (mh->nodeCount == mh->capacity) // Since nodeCount can not be negative, it is safe to compare to capacity (a size_t datatype). If this is not guaranteed, a negative value guard must be used.
+    {
+        fprintf(stderr, "Insert Error: %s\n", "min heap is already at capacity.");
+        return false;
+    }
+    if (node_id <= 0 || node_id > mh->capacity)
+    {
+        fprintf(stderr, "Insert Error: %s: %zu.\n", "node_id must fall between 0 and capacity", mh->capacity);
+        return false;
+    }
+    if (mh->position[node_id] != -1)
+    {
+        fprintf(stderr, "Insert Error: %s\n", "node ID already exists in the heap.");
+        return false;
+    }
+
+    // Create an initial new node and set its position.
+    HeapNode *node = &mh->nodes[mh->nodeCount];
+    node->node_id = node_id;
+    node->key = key;
+    mh->position[node_id] = mh->nodeCount;
+
+    int parentIdx; // initialize the parent index variable.
+
+    // Begin the sift up loop.
+    while (mh->position[node_id] > 0 && (parentIdx = (mh->position[node_id] - 1) / 2, mh->nodes[parentIdx].key > key))
+    {
+        swap(mh, mh->position[node_id], parentIdx);
+    }
+
+    // Increase nodeCount after success of the function.
+    mh->nodeCount++;
+
+    return true;
+}
