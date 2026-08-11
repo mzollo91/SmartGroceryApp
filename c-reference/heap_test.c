@@ -66,7 +66,10 @@ bool test_insert(MinHeap *mh, int node_ids[], float keys[])
 // Main & Cleanup
 void cleanup(MinHeap *mh)
 {
-    free_min_heap(mh);
+    if (mh != NULL)
+    {
+        free_min_heap(mh);
+    }
 }
 
 int main(void)
@@ -80,7 +83,7 @@ int main(void)
     }
 
     int node_ids[] = {3, 1, 2, 4};
-    float keys[] = {10.0, 15.1, 13.7, 9.8};
+    float keys[] = {20.0, 15.1, 13.7, 19.8};
 
     if (!test_insert(mh, node_ids, keys))
     {
