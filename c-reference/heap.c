@@ -92,8 +92,16 @@ bool insert(MinHeap *mh, int node_id, float key)
     int parentIdx; // initialize the parent index variable.
 
     // Begin the sift up loop.
-    while (mh->position[node_id] > 0 && (parentIdx = (mh->position[node_id] - 1) / 2, mh->nodes[parentIdx].key > key))
+    // while (mh->position[node_id] > 0 && (parentIdx = (mh->position[node_id] - 1) / 2, mh->nodes[parentIdx].key > key)) - this is a less verbose version of the block below, but at not as straight forward to understand at a glance.
+    while (mh->position[node_id] > 0)
     {
+        parentIdx = (mh->position[node_id] - 1) / 2;
+
+        if (mh->nodes[parentIdx].key <= key)
+        {
+            break;
+        }
+
         swap(mh, mh->position[node_id], parentIdx);
     }
 
