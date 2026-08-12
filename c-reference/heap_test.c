@@ -59,6 +59,17 @@ bool test_insert(MinHeap *mh, int node_ids[], float keys[])
         return false;
     }
 
+    // Ordering check
+    int correct_id_order[] = {2, 3, 1};
+    for (size_t i = 0; i < mh->capacity; i++)
+    {
+        if (mh->nodes[i].node_id != correct_id_order[i])
+        {
+            fprintf(stderr, "TEST FAILED: nodes not inserted in the correct order. At index i = %zu, node_id was %d but should be %d.\n", i, mh->nodes[i].node_id, correct_id_order[i]);
+            return false;
+        }
+    }
+
     printf("TEST PASSED: insert\n");
     return true;
 }
@@ -83,6 +94,9 @@ int main(void)
     }
 
     int node_ids[] = {3, 1, 2, 4};
+    // Correct ordering should be 2, 1, and 3, based on how the swap logic works (min heaps are not ordered, only the minimum value should be on the top).
+    // The last ID, 4, is deliberately placed in there for a capacity check.
+
     float keys[] = {20.0, 15.1, 13.7, 19.8};
 
     if (!test_insert(mh, node_ids, keys))
@@ -94,4 +108,10 @@ int main(void)
     printf("All tests passed!");
     cleanup(mh);
     return 0;
+
+    // Valgrind commands:
+    // wsl - Activate wsl.
+    // wsl --shutdown - Shutdown if needed for http proxy commands. Restart after.
+    // gcc -g -Wall -o heap_test heap.c heap_test.c - Complile debug symbols and warnings.
+    // valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./heap_test - Run Valgrind
 }
