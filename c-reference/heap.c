@@ -95,7 +95,7 @@ bool insert(MinHeap *mh, int node_id, float key)
     // while (mh->position[node_id] > 0 && (parentIdx = (mh->position[node_id] - 1) / 2, mh->nodes[parentIdx].key > key)) - this is a less verbose version of the block below, but at not as straight forward to understand at a glance.
     while (mh->position[node_id] > 0)
     {
-        parentIdx = (mh->position[node_id] - 1) / 2;
+        parentIdx = (mh->position[node_id] - 1) / 2; // Parent index is defined as (i -1) / 2, ignoring the remainder.
 
         if (mh->nodes[parentIdx].key <= key)
         {
@@ -109,4 +109,32 @@ bool insert(MinHeap *mh, int node_id, float key)
     mh->nodeCount++;
 
     return true;
+}
+
+bool extract_min(MinHeap *mh, HeapNode *minNode)
+{
+    // Check if the heap is empty first.
+    if (mh->nodeCount == 0)
+    {
+        fprintf(stderr, "Extract Min Error: %s\n", "nodeCount is 0, there are no elements in the heap.");
+        return false;
+    }
+
+    // Get the min node.
+    minNode = &mh->nodes[0];
+
+    // If the heap only has one element, the sift down process can be skipped.
+    // No need to replace the extracted node with an empty node, it will overwritten when a new node is inserted. The guards in the insert function are based on nodeCount which is decremented here.
+    if (mh->nodeCount == 1)
+    {
+        mh->position[mh->nodes[0].node_id] = -1;
+        mh->nodeCount--;
+        return true;
+    }
+
+    // Move the last element to the root and sift down.
+    swap(mh, 0, mh->position[mh->nodes[mh->nodeCount - 1].node_id]);
+    mh->nodeCount--;
+
+    // As a note, the index of the children of the sifted element are 2i+1 (left child) and 2i+2 (right child).
 }

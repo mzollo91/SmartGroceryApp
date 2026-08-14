@@ -94,7 +94,7 @@ int main(void)
     }
 
     int node_ids[] = {3, 1, 2, 4};
-    // Correct ordering should be 2, 1, and 3, based on how the swap logic works (min heaps are not ordered, only the minimum value should be on the top).
+    // Correct ordering should be 2, 3, and 1, based on how the swap logic works (min heaps are not ordered, only the minimum value should be on the top).
     // The last ID, 4, is deliberately placed in there for a capacity check.
 
     float keys[] = {20.0, 15.1, 13.7, 19.8};
