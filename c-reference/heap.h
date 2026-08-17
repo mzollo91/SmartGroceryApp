@@ -31,8 +31,9 @@ void free_min_heap(MinHeap *mh);
 
 // Function prototypes
 void swap(MinHeap *mh, int i, int j);
-bool insert(MinHeap *mh, int node_id, float key); // key is distance in this application.
+bool insert(MinHeap *mh, int nodeId, float key); // key is distance in this application.
 bool extract_min(MinHeap *mh, HeapNode *minNode);
+bool decrease_key(MinHeap *mh, int nodeId, float newKey);
 
 // End of Include Guard
 #endif

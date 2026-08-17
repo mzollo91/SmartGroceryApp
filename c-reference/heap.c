@@ -64,20 +64,20 @@ void swap(MinHeap *mh, int i, int j)
     mh->position[n2] = tempPos;
 }
 
-bool insert(MinHeap *mh, int node_id, float key)
+bool insert(MinHeap *mh, int nodeId, float key)
 {
-    // Guards against exceeding capacity, node_id values out of bounds, and inserting duplicate nodes.
+    // Guards against exceeding capacity, nodeId values out of bounds, and inserting duplicate nodes.
     if (mh->nodeCount == mh->capacity) // Since nodeCount can not be negative, it is safe to compare to capacity (a size_t datatype). If this is not guaranteed, a negative value guard must be used.
     {
         fprintf(stderr, "Insert Error: %s\n", "min heap is already at capacity.");
         return false;
     }
-    if (node_id <= 0 || node_id > mh->capacity)
+    if (nodeId <= 0 || nodeId > mh->capacity)
     {
-        fprintf(stderr, "Insert Error: %s: %zu.\n", "node_id must fall between 0 and capacity", mh->capacity);
+        fprintf(stderr, "Insert Error: %s: %zu.\n", "nodeId must fall between 0 and capacity", mh->capacity);
         return false;
     }
-    if (mh->position[node_id] != -1)
+    if (mh->position[nodeId] != -1)
     {
         fprintf(stderr, "Insert Error: %s\n", "node ID already exists in the heap.");
         return false;
@@ -85,24 +85,24 @@ bool insert(MinHeap *mh, int node_id, float key)
 
     // Create an initial new node and set its position.
     HeapNode *node = &mh->nodes[mh->nodeCount];
-    node->node_id = node_id;
+    node->node_id = nodeId;
     node->key = key;
-    mh->position[node_id] = mh->nodeCount;
+    mh->position[nodeId] = mh->nodeCount;
 
     int parentIdx; // initialize the parent index variable.
 
     // Begin the sift up loop.
-    // while (mh->position[node_id] > 0 && (parentIdx = (mh->position[node_id] - 1) / 2, mh->nodes[parentIdx].key > key)) - this is a less verbose version of the block below, but at not as straight forward to understand at a glance.
-    while (mh->position[node_id] > 0)
+    // while (mh->position[nodeId] > 0 && (parentIdx = (mh->position[nodeId] - 1) / 2, mh->nodes[parentIdx].key > key)) - this is a less verbose version of the block below, but at not as straight forward to understand at a glance.
+    while (mh->position[nodeId] > 0)
     {
-        parentIdx = (mh->position[node_id] - 1) / 2; // Parent index is defined as (i -1) / 2, ignoring the remainder.
+        parentIdx = (mh->position[nodeId] - 1) / 2; // Parent index is defined as (i -1) / 2, ignoring the remainder.
 
         if (mh->nodes[parentIdx].key <= key)
         {
             break;
         }
 
-        swap(mh, mh->position[node_id], parentIdx);
+        swap(mh, mh->position[nodeId], parentIdx);
     }
 
     // Increase nodeCount after success of the function.
@@ -169,6 +169,46 @@ bool extract_min(MinHeap *mh, HeapNode *minNode)
 
         swap(mh, smallestIdx, leafNodeIdx);
         leafNodeIdx = mh->position[leafNodeId];
+    }
+    return true;
+}
+
+bool decrease_key(MinHeap *mh, int nodeId, float newKey)
+{
+    // Check if the ID is within the bounds of the current min heap. This should also cover if the min heap is empty.
+    if (nodeId <= 0 || nodeId > mh->capacity)
+    {
+        fprintf(stderr, "Decrease Key Error: %s: %zu.\n", "nodeId must fall between 0 and capacity", mh->capacity);
+        return false;
+    }
+    // Check if the node exists in the heap.
+    if (mh->position[nodeId] == -1)
+    {
+        fprintf(stderr, "Decrease Key Error: %s\n", "node ID does not exist in the heap.");
+        return false;
+    }
+    // Check if the new key is less than the current key.
+    if (newKey >= mh->nodes[mh->position[nodeId]].key)
+    {
+        fprintf(stderr, "Decrease Key Error: %s: current key = %f, new key = %f.\n", "the new key must be less than the existing key", mh->nodes[mh->position[nodeId]].key, newKey);
+        return false;
+    }
+
+    // If the node ID is within bounds and exists, update the key.
+    mh->nodes[mh->position[nodeId]].key = newKey;
+
+    int parentIdx;
+    // Once the key is updated, sift the updated element toward the root to maintain the heap property.
+    while (mh->position[nodeId] > 0)
+    {
+        parentIdx = (mh->position[nodeId] - 1) / 2; // Parent index is defined as (i -1) / 2, ignoring the remainder.
+
+        if (mh->nodes[parentIdx].key <= newKey)
+        {
+            break;
+        }
+
+        swap(mh, mh->position[nodeId], parentIdx);
     }
     return true;
 }
