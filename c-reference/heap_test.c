@@ -39,7 +39,7 @@ bool test_insert(MinHeap *mh, int node_ids[], float keys[])
             return false;
         }
 
-        // Duplicate ID Check - runs only on the first iteration of the loop. This needs to be tested before the graph is at capacity.
+        // Duplicate ID Check - runs only on the first iteration of the loop. This needs to be tested before the heap is at capacity.
         if (i == 0)
         {
             ok = insert(mh, node_ids[i], keys[i]);
@@ -74,6 +74,32 @@ bool test_insert(MinHeap *mh, int node_ids[], float keys[])
     return true;
 }
 
+bool test_extract_min(MinHeap *mh, HeapNode *minNode, MinHeap *emptyHeap)
+{
+    // Check the empty capacity guard/
+    bool ok = extract_min(emptyHeap, minNode);
+    if (ok)
+    {
+        fprintf(stderr, "TEST FAILED: extract_min was successful on an empty heap.\n");
+        return false;
+    }
+    // Cleanup the dummmy heap.
+
+    ok = extract_min(mh, minNode);
+    if (!ok)
+    {
+        fprintf(stderr, "TEST FAILED: extract_min failed on a valid heap.\n");
+        return false;
+    }
+    if (minNode->node_id != 2 || minNode->key != 13.7f)
+    {
+        fprintf(stderr, "TEST FAILED: extract_min failed to extract the minimum node. Got node_id = %d and key = %f, expected node_id = 2 and key = 13.7.\n", minNode->node_id, minNode->key);
+        return false;
+    }
+    printf("TEST PASSED: extract_min\n");
+    return true;
+}
+
 // Main & Cleanup
 void cleanup(MinHeap *mh)
 {
@@ -104,6 +130,18 @@ int main(void)
         cleanup(mh);
         return 1;
     }
+
+    MinHeap *emptyHeap = create_min_heap(5);
+    HeapNode minNode;
+
+    if (!test_extract_min(mh, &minNode, emptyHeap))
+    {
+        cleanup(emptyHeap);
+        cleanup(mh);
+        return 1;
+    }
+
+    cleanup(emptyHeap);
 
     printf("All tests passed!");
     cleanup(mh);

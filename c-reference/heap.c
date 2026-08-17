@@ -120,21 +120,55 @@ bool extract_min(MinHeap *mh, HeapNode *minNode)
         return false;
     }
 
-    // Get the min node.
-    minNode = &mh->nodes[0];
+    // Get the min node and reset its position to -1.
+    *minNode = mh->nodes[0]; // dereference and copy, using "&" will reassign the pointer to minNode.
 
-    // If the heap only has one element, the sift down process can be skipped.
     // No need to replace the extracted node with an empty node, it will overwritten when a new node is inserted. The guards in the insert function are based on nodeCount which is decremented here.
-    if (mh->nodeCount == 1)
-    {
-        mh->position[mh->nodes[0].node_id] = -1;
-        mh->nodeCount--;
-        return true;
-    }
 
-    // Move the last element to the root and sift down.
-    swap(mh, 0, mh->position[mh->nodes[mh->nodeCount - 1].node_id]);
+    // Move the last element to the root.
+    int leafNodeId = mh->nodes[mh->nodeCount - 1].node_id;
+    int oldRootId = mh->nodes[0].node_id;
+
+    swap(mh, mh->position[oldRootId], mh->position[leafNodeId]);
+    int leafNodeIdx = mh->position[leafNodeId]; // In the case of 1 element heap, the leafNodeIdx and the old root index will be the same. Setting the position to -1 first would result in leafNodeIdx not having a real index value.
+    mh->position[oldRootId] = -1;               // Set the position to the old root to -1 after the swap has been made. If done before, it can cause the new, valid root's position to be set to -1; indicating that is doesn't exist in the heap.
+
     mh->nodeCount--;
 
     // As a note, the index of the children of the sifted element are 2i+1 (left child) and 2i+2 (right child).
+    // Sift down loop.
+    while (true)
+    {
+        int smallestIdx = leafNodeIdx;
+
+        int leftChildIdx = 2 * leafNodeIdx + 1;
+        int rightChildIdx = 2 * leafNodeIdx + 2;
+
+        if (leftChildIdx < mh->nodeCount) // Check to see if the child index is valid based on nodeCount.
+        {
+            float leftChild_key = mh->nodes[leftChildIdx].key;
+            if (leftChild_key < mh->nodes[smallestIdx].key)
+            {
+                smallestIdx = leftChildIdx;
+            }
+        }
+
+        if (rightChildIdx < mh->nodeCount) // Check to see if the child index is valid based on nodeCount.
+        {
+            float rightChild_key = mh->nodes[rightChildIdx].key;
+            if (rightChild_key < mh->nodes[smallestIdx].key)
+            {
+                smallestIdx = rightChildIdx;
+            }
+        }
+
+        if (smallestIdx == leafNodeIdx)
+        {
+            break;
+        }
+
+        swap(mh, smallestIdx, leafNodeIdx);
+        leafNodeIdx = mh->position[leafNodeId];
+    }
+    return true;
 }
