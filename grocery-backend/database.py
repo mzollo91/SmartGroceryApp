@@ -27,3 +27,7 @@ async def get_db():
     """FastAPI dependency: yields a session and guarantees cleanup."""
     async with AsyncSessionLocal() as session:
         yield session
+
+def get_sync_url() -> str:
+    SYNC_DATABASE_URL = DATABASE_URL.replace("sqlite+aiosqlite","sqlite")
+    return SYNC_DATABASE_URL
