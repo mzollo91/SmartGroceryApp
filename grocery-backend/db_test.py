@@ -27,6 +27,19 @@ def test_connection():
     except Exception as e:
         print(f"Error connecting to the database: {e}")
 
+def get_alembic_versions():
+    try:
+        with sqlite3.connect('grocery.db') as conn: # Use the 'with' block to guarantee that the connection closes at the end, even if an exception is thrown partway.
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM alembic_version;")
+            versions = cursor.fetchall()
+            for version in versions:
+                print(f"Table: {version}")
+        
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+
 if __name__ == "__main__":
     #asyncio.run(init_db())
-    test_connection()
+    #test_connection()
+    get_alembic_versions()
