@@ -34,7 +34,7 @@ def get_alembic_versions():
             cursor.execute("SELECT * FROM alembic_version;")
             versions = cursor.fetchall()
             for version in versions:
-                print(f"Table: {version}")
+                print(f"Revision: {version[0]}")
         
     except Exception as e:
         print(f"Error connecting to the database: {e}")
