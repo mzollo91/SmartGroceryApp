@@ -3,7 +3,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
-DATABASE_URL = "sqlite+aiosqlite:///./grocery.db"
+# DATABASE_URL = "sqlite+aiosqlite:///./grocery.db"
+DATABASE_URL = ""
 
 # Base is the parent class that every table model will inherit from.
 # It provides the necessary metadata and functionality for SQLAlchemy to work with the database.
