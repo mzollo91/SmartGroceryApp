@@ -2,9 +2,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from dotenv import load_dotenv
+import os
 
 # DATABASE_URL = "sqlite+aiosqlite:///./grocery.db"
-DATABASE_URL = ""
+load_dotenv()
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 # Base is the parent class that every table model will inherit from.
 # It provides the necessary metadata and functionality for SQLAlchemy to work with the database.
