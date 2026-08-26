@@ -429,3 +429,5 @@ GroceryFrontend/obj
 *.lnk
 
 *.ini
+
+grocery-backend/migrations/env.py
