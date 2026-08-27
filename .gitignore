@@ -430,4 +430,4 @@ GroceryFrontend/obj
 
 *.ini
 
-grocery-backend/migrations/env.py
+*.env

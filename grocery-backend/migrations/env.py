@@ -22,6 +22,7 @@ target_metadata = Base.metadata
 
 def get_sync_url() -> str:
     sync_url = DATABASE_URL.replace("postgresql+asyncpg","postgresql+psycopg2")
+    #sync_url = sync_url.replace("ssl=require", "sslmode=require")
     return sync_url
 
 # other values from the config, defined by the needs of env.py,

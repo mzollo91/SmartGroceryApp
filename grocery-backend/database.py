@@ -4,6 +4,7 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from dotenv import load_dotenv
 import os
+import asyncpg
 
 # DATABASE_URL = "sqlite+aiosqlite:///./grocery.db"
 load_dotenv()
@@ -16,9 +17,10 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 
 @event.listens_for(engine.sync_engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
+    if engine.dialect.name == "sqlite": # Check to see if the database is SQLite. PRAGMA is specific to SQLite and the DB is currently PostgresSQL, which enforces foreign key constraints by default.
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 Base = declarative_base()
 
